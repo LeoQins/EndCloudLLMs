@@ -5,6 +5,15 @@ import requests
 import json
 import os
 import shutil # 用于删除文件夹
+import subprocess
+import os
+import sys
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+import imaplib
+import email
+
 api_key='W8KN00M-RVA45WX-PVN3WNV-ZWT8JG7'
 #默认
 MODE='chat'
@@ -103,8 +112,53 @@ def add_thread(wb):
     response = requests.post(f'http://localhost:3001/api/v1/workspace/{wb}/thread/new', headers=headers, json=json_data)
     print(response.content)
 
+
+def send_email(sender, sender_password, receiver, subject, body, smtp_server, smtp_port):#发送邮箱函数
+    msg = MIMEText(body, 'plain', 'utf-8')
+    msg['Subject'] = Header(subject, 'utf-8')
+    msg['From'] = sender
+    msg['To'] = receiver
+
+    server = None 
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls() 
+        server.login(sender, sender_password)
+        server.sendmail(sender, [receiver], msg.as_string())
+        print('邮件发送成功')
+    except Exception as e:
+        print('邮件发送失败:', e)
+    finally:
+        if server:
+            server.quit()
+
+def sending():#发送邮件
+    # 从环境变量中获取敏感信息
+    sender = os.environ.get('SENDER_EMAIL')  # 在环境变量中设置发件人邮箱
+    sender_password = os.environ.get('SENDER_PASSWORD')  # 在环境变量中设置邮箱密码或应用专用密码
+
+    if not sender or not sender_password:
+        print("错误：请设置环境变量 SENDER_EMAIL 和 SENDER_PASSWORD。")
+        sys.exit(1)
+
+    # 其它邮件参数
+    receiver = '1364075575@qq.com'
+    subject = '端云协同大模型智能平台'
+    body = '有人在使用端云协同大模型智能平台，请及时查看！'
+    smtp_server = 'mails.qust.edu.cn'
+    smtp_port = 25
+    send_email(sender, sender_password, receiver, subject, body, smtp_server, smtp_port)
+    # receiver2='2386429425@qq.com'
+    # send_email(sender, sender_password, receiver2, subject, body, smtp_server, smtp_port)
+
+
+def funccmd():
+    # 捕获输出
+    subprocess.run(["docker", "start", "admiring_engelbart"])
+    sending()
 @app.route("/", methods=["GET"])
 def index():
+    funccmd()
     return render_template("chat.html")
 #展示所有工作区和分支
 def show_workspace():
