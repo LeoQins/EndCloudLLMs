@@ -493,14 +493,14 @@ def restart_action():
     subprocess.run(["docker", "stop", "admiring_engelbart"])#关闭容器
 
 def scheduled_restart():
-    time.sleep(3600)  # 60分钟（1800秒）后执行
+    time.sleep(3600)  # 60分钟（3600秒）后执行
     restart_action()
     # 重启当前 Python 程序
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
+    # python = sys.executable
+    # os.execl(python, python, *sys.argv)
 
 if __name__ == '__main__':
-     # 启动定时重启线程（守护线程）
+     # 启动定时关闭docker
     restart_thread = threading.Thread(target=scheduled_restart, daemon=True)
     restart_thread.start()
     app.run(port=5000, debug=False)
