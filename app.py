@@ -13,6 +13,11 @@ from email.mime.text import MIMEText
 from email.header import Header
 import imaplib
 import email
+import threading
+import time
+
+
+
 
 api_key='W8KN00M-RVA45WX-PVN3WNV-ZWT8JG7'
 #默认
@@ -148,13 +153,13 @@ def sending():#发送邮件
     smtp_server = 'mails.qust.edu.cn'
     smtp_port = 25
     send_email(sender, sender_password, receiver, subject, body, smtp_server, smtp_port)
-    # receiver2='2386429425@qq.com'
-    # send_email(sender, sender_password, receiver2, subject, body, smtp_server, smtp_port)
+    #receiver2='2386429425@qq.com'
+    #send_email(sender, sender_password, receiver2, subject, body, smtp_server, smtp_port)
 
 
 def funccmd():
     # 捕获输出
-    subprocess.run(["docker", "start", "admiring_engelbart"])
+    subprocess.run(["docker", "start", "admiring_engelbart"])#启动容器
     sending()
 @app.route("/", methods=["GET"])
 def index():
@@ -480,6 +485,23 @@ def refresh():
     upload_workspace()
     return jsonify({'status': 'success'})
 
+
+def restart_action():
+    print("60分钟已到，执行重启前操作...")
+    # 在此处添加你需要执行的操作，比如调用funccmd()或其它函数
+    # funccmd()
+    subprocess.run(["docker", "stop", "admiring_engelbart"])#关闭容器
+
+def scheduled_restart():
+    time.sleep(3600)  # 60分钟（1800秒）后执行
+    restart_action()
+    # 重启当前 Python 程序
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
 if __name__ == '__main__':
+     # 启动定时重启线程（守护线程）
+    restart_thread = threading.Thread(target=scheduled_restart, daemon=True)
+    restart_thread.start()
     app.run(port=5000, debug=False)
 
