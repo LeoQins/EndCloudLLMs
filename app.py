@@ -493,8 +493,13 @@ def restart_action():
     subprocess.run(["docker", "stop", "admiring_engelbart"])#关闭容器
 
 def scheduled_restart():
-    time.sleep(3600)  # 60分钟（3600秒）后执行
-    restart_action()
+
+    interval = 3600  # 设置间隔时间，单位为秒；实际场景下可改为3600秒
+    while True:
+        time.sleep(interval)
+        restart_action()
+
+
     # 重启当前 Python 程序
     # python = sys.executable
     # os.execl(python, python, *sys.argv)
