@@ -544,7 +544,8 @@ function uploadFile(file, container) {
   formData.append('file', file);  // 修改参数名为单数[3](@ref)
 
   $.ajax({
-    url: 'http://127.0.0.1:5000/upload', // 明确后端地址[3,4](@ref)
+    //url: 'http://127.0.0.1:5000/upload', // 明确后端地址[3,4](@ref)
+    url: 'https://2maar3390283.vicp.fun:443/upload', // 明确后端地址[3,4](@ref)
     type: 'POST',
     data: formData,
     processData: false,
